@@ -1,3 +1,19 @@
+import argparse
+import time
+from pathlib import Path
+
+import cv2
+import torch
+import torch.backends.cudnn as cudnn
+
+from models.experimental import attempt_load
+from utils.datasets import LoadStreams, LoadImages
+from utils.general import check_img_size, check_requirements, check_imshow, non_max_suppression, apply_classifier, \
+    scale_coords, xyxy2xywh, strip_optimizer, set_logging, increment_path, save_one_box
+from utils.plots import colors, plot_one_box
+from utils.torch_utils import select_device, load_classifier, time_synchronized
+import csv
+
 def detect(opt):
     source, weights, view_img, save_txt, imgsz = opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size
     save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
@@ -124,17 +140,18 @@ def detect(opt):
                             save_path += '.mp4'
                         vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
                     vid_writer.write(im0)
-                    csv_save_path='results.csv'
-                    with open(csv_save_path,'w',newline='') as csvf:
-                      csvw=csv.writer(csvf)
-                      for row in all_data:
-                          csvw.writerow(row)
+                    #csv_save_path=
+
 
     if save_txt or save_img:
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
         print(f"Results saved to {save_dir}{s}")
 
     print(f'Done. ({time.time() - t0:.3f}s)')
+    with open('results.csv','w',newline='') as csvf:
+        csvw=csv.writer(csvf)
+        for row in all_data:
+            csvw.writerow(row)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
